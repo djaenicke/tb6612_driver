@@ -1,5 +1,5 @@
-#ifndef MOTOR_DRIVERS_TB6612_H_
-#define MOTOR_DRIVERS_TB6612_H_
+#ifndef TB6612_H_
+#define TB6612_H_
 
 #include "mbed.h"
 
@@ -42,4 +42,4 @@ class TB6612 {
 
 }  // namespace tb6612
 
-#endif  // MOTOR_DRIVERS_TB6612_H_
+#endif  // TB6612_H_
