@@ -111,12 +111,12 @@ void TB6612::SetDC(Motor_Id_T motor, uint8_t percent) {
 void TB6612::Stop(Motor_Id_T motor) {
   switch (motor) {
     case MOTOR_A:
-      a_in1_ = 1;
-      a_in2_ = 1;
+      a_in1_ = 0;
+      a_in2_ = 0;
       break;
     case MOTOR_B:
-      b_in1_ = 1;
-      b_in2_ = 1;
+      b_in1_ = 0;
+      b_in2_ = 0;
       break;
     default:
       MBED_ASSERT(false);
@@ -124,8 +124,10 @@ void TB6612::Stop(Motor_Id_T motor) {
 }
 
 void TB6612::Freewheel(void) {
-  SetDC(MOTOR_A, 0);
-  SetDC(MOTOR_B, 0);
+  Stop(MOTOR_A);
+  Stop(MOTOR_B);
+  SetDC(MOTOR_A, 100);
+  SetDC(MOTOR_B, 100);
 }
 
 }  // namespace tb6612
