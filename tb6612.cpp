@@ -1,52 +1,68 @@
 #include "tb6612.h"
 
-namespace tb6612 {
-
-TB6612::TB6612(PinName pwm_a, PinName pwm_b, PinName a_in1, \
-           PinName a_in2, PinName b_in1, PinName b_in2,
-           Motor_Polarity_T a_polarity, Motor_Polarity_T b_polarity):
-           pwm_a_(pwm_a), pwm_b_(pwm_b), a_in1_(a_in1),
-           a_in2_(a_in2), b_in1_(b_in1), b_in2_(b_in2) {
+namespace tb6612
+{
+TB6612::TB6612(PinName pwm_a, PinName pwm_b, PinName a_in1, PinName a_in2, PinName b_in1, PinName b_in2,
+               MotorPolarity a_polarity, MotorPolarity b_polarity)
+    : pwm_a_(pwm_a), pwm_b_(pwm_b), a_in1_(a_in1), a_in2_(a_in2), b_in1_(b_in1), b_in2_(b_in2)
+{
   a_polarity_ = a_polarity;
   b_polarity_ = b_polarity;
 }
 
-void TB6612::SetPWMPeriod(float period_s) {
-    pwm_a_.period(period_s);
-    pwm_b_.period(period_s);
+void TB6612::setPWMPeriod(float period_s)
+{
+  pwm_a_.period(period_s);
+  pwm_b_.period(period_s);
 }
 
-Direction_T TB6612:: HandlePolarity(Motor_Polarity_T polarity, Direction_T new_dir) {
-  Direction_T ret_val;
+Direction TB6612::handlePolarity(MotorPolarity polarity, Direction new_dir)
+{
+  Direction ret_val;
 
-  if (STANDARD == polarity) {
+  if (STANDARD == polarity)
+  {
     ret_val = new_dir;
-  } else if (FORWARD == new_dir) {
+  }
+  else if (FORWARD == new_dir)
+  {
     ret_val = REVERSE;
-  } else if (REVERSE == new_dir) {
+  }
+  else if (REVERSE == new_dir)
+  {
     ret_val = FORWARD;
-  } else {
+  }
+  else
+  {
     MBED_ASSERT(false);
   }
 
   return ret_val;
 }
 
-void TB6612::SetDirection(Motor_Id_T motor, Direction_T new_dir) {
-  Direction_T dir;
+void TB6612::setDirection(MotorId motor, Direction new_dir)
+{
+  Direction dir;
 
-  if (MOTOR_A == motor) {
-    dir = HandlePolarity(a_polarity_, new_dir);
+  if (MOTOR_A == motor)
+  {
+    dir = handlePolarity(a_polarity_, new_dir);
     motor_a_dir_ = new_dir;
-  } else if (MOTOR_B == motor) {
-    dir = HandlePolarity(b_polarity_, new_dir);
+  }
+  else if (MOTOR_B == motor)
+  {
+    dir = handlePolarity(b_polarity_, new_dir);
     motor_b_dir_ = new_dir;
-  } else {
+  }
+  else
+  {
     MBED_ASSERT(false);
   }
-  switch (dir) {
+  switch (dir)
+  {
     case FORWARD:
-      switch (motor) {
+      switch (motor)
+      {
         case MOTOR_A:
           a_in1_ = 1;
           a_in2_ = 0;
@@ -60,7 +76,8 @@ void TB6612::SetDirection(Motor_Id_T motor, Direction_T new_dir) {
       }
       break;
     case REVERSE:
-      switch (motor) {
+      switch (motor)
+      {
         case MOTOR_A:
           a_in1_ = 0;
           a_in2_ = 1;
@@ -73,15 +90,17 @@ void TB6612::SetDirection(Motor_Id_T motor, Direction_T new_dir) {
           MBED_ASSERT(false);
       }
       break;
-        default:
-        MBED_ASSERT(false);
+    default:
+      MBED_ASSERT(false);
   }
 }
 
-Direction_T TB6612::GetDirection(Motor_Id_T motor) {
-  Direction_T dir;
+Direction TB6612::getDirection(MotorId motor)
+{
+  Direction dir;
 
-  switch (motor) {
+  switch (motor)
+  {
     case MOTOR_A:
       dir = motor_a_dir_;
       break;
@@ -95,21 +114,25 @@ Direction_T TB6612::GetDirection(Motor_Id_T motor) {
   return (dir);
 }
 
-void TB6612::SetDC(Motor_Id_T motor, uint8_t percent) {
-  switch (motor) {
+void TB6612::setDutyCycle(MotorId motor, uint8_t percent)
+{
+  switch (motor)
+  {
     case MOTOR_A:
-      pwm_a_ = percent/100.0f;
+      pwm_a_ = percent / 100.0f;
       break;
     case MOTOR_B:
-      pwm_b_ = percent/100.0f;
+      pwm_b_ = percent / 100.0f;
       break;
     default:
       MBED_ASSERT(false);
   }
 }
 
-void TB6612::Stop(Motor_Id_T motor) {
-  switch (motor) {
+void TB6612::stop(MotorId motor)
+{
+  switch (motor)
+  {
     case MOTOR_A:
       a_in1_ = 0;
       a_in2_ = 0;
@@ -123,11 +146,12 @@ void TB6612::Stop(Motor_Id_T motor) {
   }
 }
 
-void TB6612::Freewheel(void) {
-  Stop(MOTOR_A);
-  Stop(MOTOR_B);
-  SetDC(MOTOR_A, 100);
-  SetDC(MOTOR_B, 100);
+void TB6612::freewheel(void)
+{
+  stop(MOTOR_A);
+  stop(MOTOR_B);
+  setDutyCycle(MOTOR_A, 100);
+  setDutyCycle(MOTOR_B, 100);
 }
 
 }  // namespace tb6612
